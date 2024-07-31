@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather App</title>
+    <link href="style.css" rel="stylesheet">
+  </head>
+  <body>
+    <script src="/app.js" defer></script>
+    <script type="module" src="/main.js"></script>
+
+    <div class="min-h-screen bg-gray-100 flex pt-20">
+      <div class="w-full max-w-md mx-auto">
+        <h1 class="font-bold text-sky-800 text-2xl text-center mb-4">What's the weather like ?</h1>
+        
+        <div x-data="weatherSearch()" x-init="fetchWeatherData()">
+
+          <div class="space-y-2 flex mb-4">
+            <input
+              type="text"
+              name="weatherCitySearch"
+              x-model="weatherCitySearch"
+              class="w-full border border-sky-800 rounded-lg mr-4 p-2"
+            />
+            <button type="submit" @click="fetchWeatherData()" class="border border-yellow-600 rounded-lg bg-yellow-600 hover:bg-yellow-700">
+              <span class="p-3 text-white">Submit</span>
+            </button>
+          </div>
+          <div x-show="errorMessage" class="font-bold text-red-800">
+            <p x-text="errorMessage"></p>
+          </div>
+     
+          <template x-if="weatherData != null && weatherCitySearch != ''">
+            <div class="shadow rounded-lg bg-sky-800 w-full"> 
+              <div class="flex">
+                <div class="bg-white flex py-5 px-8 shadow rounded-lg w-2/5">
+                  <div class="flex-1">
+                    <h2 class="font-bold text-sky-800 text-lg mb-3">
+                      <div x-text="weekDayLong(new Date())"></div>
+                      <div x-text="formattedDateDisplay(new Date())"></div>
+                    </h2>
+                    <div class="text-gray-600 text-md" x-text="weatherData.location.name +', '+ weatherData.location.country"></div>
+                    <div class="w-24 my-10">
+                      <img :src="`https:${weatherData.current.condition.icon}`" :alt="weatherData.current.condition.text" loading="lazy">
+                    </div>
+                    <div class="text-3xl font-bold text-sky-800" x-html="`${weatherData.current.temp_c} &deg;C`"></div>
+                    <div class="text-xs text-gray-600 mt-3" x-text="weatherData.current.condition.text"></div>
+                  </div>
+                </div>
+          
+                <div class="flex-col p-5 w-3/5">
+
+                  <div class="text-white mb-4">
+                    <div class="flex justify-between"><span>Felt temperature</span>
+                      <div><span x-text="weatherData.current.feelslike_c"></span><span>&deg;C</span></div>
+                    </div>
+                    <div class="flex justify-between"><span>Wind</span>
+                      <div><span x-text="weatherData.current.wind_kph"></span><span>km/h</span></div>
+                    </div>
+                    <div class="flex justify-between"><span>Precipitations</span>
+                      <div><span x-text="weatherData.current.precip_mm"></span><span>mm</span></div>
+                    </div>
+                    <div class="flex justify-between"><span>Humidity</span>
+                      <div><span x-text="weatherData.current.humidity"></span><span>%</span></div>
+                    </div>
+                    <div class="flex justify-between"><span>UV index</span>
+                      <span x-text="weatherData.current.uv"></span>
+                    </div>
+                  </div>
+
+                  <div class="flex space-between">
+                    <template x-for="(forecast, key) in weatherData.forecast.forecastday.splice(1)">
+                      <div class="flex-1 text-center p-3 rounded-lg bg-white mx-2">
+                        <div class="text-xs font-bold text-sky-800">
+                          <div x-text="weekDayLong(new Date(forecast.date))"></div>
+                          <div x-text="`${forecast.date.split('-')[2]}/${forecast.date.split('-')[1]}/${forecast.date.split('-')[0]}`"></div>
+                        </div>
+                        <img :src="`https:${forecast.day.condition.icon}`" :alt="forecast.day.condition.text" loading="lazy" class="mx-auto">
+                        <div x-html="`${forecast.day.maxtemp_c} &deg;C`" class="font-semibold text-gray-800 mt-1.5 dark:text-gray-300"></div>
+                        <div x-text="forecast.day.condition.text" class="text-xs text-gray-600 dark:text-gray-400"></div>
+                      </div>
+                    </template>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <template x-if="weatherCitySearch == ''">
+            <div class="shadow rounded-lg bg-sky-800 w-full"> 
+              <div class="flex mt-4 mb-5">
+                <div class="flex-1">
+                  <div class="text-white p-2">Please choose a city</div>    
+                </div>
+              </div>
+            </div>
+          </template>
+
+        </div>
+      </div>
+  </body>
+</html>
